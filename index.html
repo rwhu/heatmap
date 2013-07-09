@@ -12,10 +12,13 @@
 	<meta name="author" content="Roger Hu" />
 	<script src="http://d3js.org/d3.v2.min.js?2.8.1"></script>
 	<script src="./heatmap.js"></script>
+	<script src="./lib/colorbrewer.js"></script>
+	<script src="./utilities.js"></script>
+	<script src="./lib/jquery-1.10.2.min.js"></script>
 </head>
 
 <body>	
-	<h1>Practice Heatmap</h1>
+	<h1>Heatmap Tool</h1>
 
     <style>
       #progress_bar {
@@ -42,14 +45,27 @@
     <input type="file" id="files" name="file" />
     <button onclick="abortRead();">Cancel read</button>
     <div id="progress_bar"><div class="percent">0%</div></div>
-
+	<script>
+        var n = 60,
+        m=6000,
+        zero = d3.range(n).map(function() { return 0; }),
+        matrix = zero.map(function() { return zero.slice(); });
+        // Fill matrix with random values
+        for (var i = 0; i<matrix.length; i++) {
+            for (var j = 0; j<matrix.length; j++) {
+                matrix[i][j]=Math.random();
+            }
+        }	
+	</script>	
     <script>
+    	var annots;
     	// Check for the various File API support.
         if (window.File && window.FileReader && window.FileList && window.Blob) {
           // Great success! All the File APIs are supported.
         } else {
           alert('The File APIs are not fully supported in this browser.');
         }
+        
         var reader;
       	var progress = document.querySelector('.percent');
 
@@ -107,31 +123,18 @@
                 var tmp = reader.result;
                 annots = JSON.parse(tmp);
             }
-            // Read in the image file as a binary string.
+            // Read in the image file as text
             reader.readAsText(evt.target.files[0]);
         }
         document.getElementById('files').addEventListener('change', handleFileSelect, false);
     </script>
-    
-    <input type="button" name="Draw Heatmap" value="Draw" onclick="drawHeatmap(matrix,annots);">
+     
+    <input type="button" name="Choose Annotations" value="Choose Annotations" onclick="addAnnots(annots);">
+    <input type="button" name="Draw Heatmap" value="Draw Heatmap" onclick="drawHeatmap(matrix,annots);">
+    <input type="button" name="Draw Heatmap" value="Add Annotations" onclick="drawColorPlot(annots);">
+    <form id="annot_form"></form>
 	<div id="heatmap"></div>
 	<div id="colorbar"></div>
-	
-	<script>
-        var n = 60,
-        m=6000,
-        zero = d3.range(n).map(function() { return 0; }),
-        matrix = zero.map(function() { return zero.slice(); });
-        // Fill matrix with random values
-        for (var i = 0; i<matrix.length; i++) {
-            for (var j = 0; j<matrix.length; j++) {
-                matrix[i][j]=Math.random();
-            }
-        }
-
-		
-	</script>
-
 	
 	<footer>
 		<p>
