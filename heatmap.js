@@ -1,5 +1,5 @@
 function drawHeatmap(matrix,annots) {
-    var margin = {top: 20.5, right: -.5, bottom: 9.5, left: 20.5},
+    var margin = {top: 75, right: -.5, bottom: 9.5, left: 75},
         width = 720,
         height = 720;
     /*
@@ -65,7 +65,7 @@ function drawHeatmap(matrix,annots) {
         .attr("y", xScale.rangeBand() / 2)
         .attr("dy", ".32em")
         .attr("text-anchor", "end")
-        .text(function(d, i) { return i; });
+        .text(function(d, i) { return annots[i].id; });
         
     row.selectAll(".cell")
       .data(function(d, i) { return matrix[i]; })
@@ -85,7 +85,7 @@ function drawHeatmap(matrix,annots) {
         .attr("y", xScale.rangeBand() / 2)
         .attr("dy", ".32em")
         .attr("text-anchor", "start")
-        .text(function(d, i) { return i; });
+        .text(function(d, i) { return annots[i].id; });
     
     /* 
      * PLOT COLORBARS
