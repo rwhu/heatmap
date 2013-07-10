@@ -128,18 +128,18 @@
         }
         document.getElementById('files').addEventListener('change', handleFileSelect, false);
     </script>
-     
-    <input type="button" name="Choose Annotations" value="Choose Annotations" onclick="addAnnots(annots);">
-    <input type="button" name="Draw Heatmap" value="Draw Heatmap" onclick="drawHeatmap(matrix,annots);">
-    <input type="button" name="Draw Heatmap" value="Add Annotations" onclick="drawColorPlot(annots);">
+    <div id="control_panel"> 
+        <input type="button" name="Choose Annotations" value="Choose Annotations" onclick="addAnnots(annots);">
+        <input type="button" name="Draw Heatmap" value="Draw Heatmap" onclick="drawHeatmap(matrix,annots);">
+        <input type="button" name="Draw Heatmap" value="Add Annotations" onclick="drawColorPlot(annots,[],Object());">
+    </div>
+    
     <form id="annot_form"></form>
 	<div id="heatmap"></div>
 	<div id="colorbar"></div>
 	
 	<footer>
-		<p>
-			&copy; Copyright  by Roger Hu
-		</p>
+	    Built with d3.js
 	</footer>
 	
 </body>

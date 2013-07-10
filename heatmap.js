@@ -9,13 +9,19 @@
 //TODO: Beautify the user interface
 //TODO: Dynamic text sizing
 //TODO: Make custom color palette for categorial variables with more than 20 levels
+/**
+ * @param: plotConfig: an object that contains the sizes needed to make the plot
+ *                     any size
+ */
+function initHeatmap() {
+    return;
+}
 
-function drawHeatmap(matrix,annots) {
+function drawHeatmap(matrix,annots,plotObj) {
 	var n = matrix.length;
-    var margin = {top: 75, right: -.5, bottom: 9.5, left: 75},
-        width = 720,
-        height = 720;
-    
+    var margin = {top: 150, right: -.5, bottom: 9.5, left: 150},
+        width = 800,
+        height = 800;
     /* 
      * PLOT HEATMAP
      */
@@ -89,18 +95,40 @@ function drawHeatmap(matrix,annots) {
         
 }
 
-function drawColorPlot() {
-	var margin = {top: 75, right: -.5, bottom: 9.5, left: 75},
-        width = 720,
-        height = 720;
+function initColorPlot() {
+    return;
+}
+
+function drawColorPlot(annots,whichAnnots,plotObj) {
+    n = annots.length;
+    annot_data = new Array();
+    keys = Object.keys(annots[0]);
+    for (var i = 0; i < keys.length; i++) {
+        console.log(i);
+        annot_data.push(annots.map(function(d) {return d[keys[i]];}));
+    }
+    
+    var nAnnots = Object.keys(annot_data).length;
+    
+    var whichAnnots = Object.keys(annots)
+    var margin = {top: 150, right: -.5, bottom: 9.5, left: 150},
+        width = 800,
+        height = 300;
+    
+
 	var xScale = d3.scale.ordinal()
 		.domain(d3.range(n))
-        .rangeBands([0, width],5);
+        .rangeBands([0, width]);
+    var yScale = d3.scale.ordinal()
+        .domain(d3.range(nAnnots))
+        .rangeBands([0,height]);
     
     // Start off by making a color bar for each of the annotations
-	var annotScales = Object();
-    for (k in annots[1]) {
-    	var vals = annots.map(function(e) {
+	annotScales = Object();
+    for (var i = 0; i < keys.length; i++) {
+        var k = Object.keys(annots[1])[i];
+        console.log(k);
+    	vals = annots.map(function(e) {
     			return e[k];
     		});
     	//DEBUG
@@ -125,15 +153,17 @@ function drawColorPlot() {
     			annotScales[k] = scale;
     			break;
     		case "number":
+    		    console.log("Found number");
     			[q1,q3] = d3.extent(vals);
     			q2 = d3.median(vals);
-    			var colorbarScale = d3.scale.linear()
+    			var scale = d3.scale.linear()
     				.domain([q1, q2, q3])
-    				.range(["blue", "white", "red"])
+    				.range(["black", "white", "red"])
     				.clamp(true);
     			annotScales[k] = scale;
     			break;
 			case "boolean":
+			    console.log('Found Boolean');
 				var scale = d3.scale.ordinal()
 					.domain([true,false])
 					.range([colorbrewer.Paired[3][0],
@@ -144,10 +174,11 @@ function drawColorPlot() {
 				alert('Unrecognized JSON annotation type.');
             };    	
     }
+    
 	var colorsvg = d3.select("#colorbar")
 		.append("svg")
 			.attr("width", width + margin.left + margin.right)
-			.attr("height", 25 + margin.top + margin.bottom)
+			.attr("height", height + margin.top + margin.bottom)
 			.style("margin-left", margin.left + "px")
   		.append("g")
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -155,14 +186,14 @@ function drawColorPlot() {
     colorsvg.append("rect")
         .attr("class", "background")
         .attr("width", width)
-        .attr("height", 25);
+        .attr("height", height);
     
-    var colorrow = colorsvg.selectAll(".colorrow")
-        .data(annot1)
+    colorrow = colorsvg.selectAll(".colorrow")
+        .data(annot_data)
         .enter()
         .append("g")
           .attr("class", "colorrow")
-          .attr("transform", function(d, i) { return "translate(0," + xScale(i) + ")"; });
+          .attr("transform", function(d, i) { return "translate(0," + yScale(i) + ")"; });
     
     colorrow.selectAll(".cell")
        .data(function(d) { return d; })
@@ -171,12 +202,24 @@ function drawColorPlot() {
         .attr("class", "cell")
         .attr("x", function(d, i) { return xScale(i); })
         .attr("width", xScale.rangeBand())
-        .attr("height", 25);
-        
+        .attr("height", yScale.rangeBand());
+    var idx = -1;    
     colorrow.selectAll(".cell")
-      .data(function(d, i) { return annot[i]['lastname']; })
-      .style("fill", colorbarScale);
+      .data(function(d, i) { return d; })
+      .style("fill", 
+             function(d,i) {
+                 //console.log(d)
+                 var color = "black";
+                 if (i==0) {
+                     idx = idx + 1;
+                 }
+                 var color = annotScales[Object.keys(annotScales)[idx]](d);
+                 return color});
 	
+}
+
+function redrawColorPlot() {
+    return;
 }
 
 d3.unique = function(array) {
